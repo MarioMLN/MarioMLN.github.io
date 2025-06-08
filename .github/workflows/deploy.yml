@@ -1,11 +1,26 @@
-image: alpine:latest
+name: Deploy to GitHub Pages
 
-pages:
-    stage: deploy
-    script:
-        - echo "Publicando site..."
-    artifacts:
-        paths:
-            - public
-    only:
-        - main
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check if index.html exists
+        run: |
+          if [ ! -f public/index.html ]; then
+            echo "Erro: public/index.html não existe."
+            exit 1
+          fi
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
