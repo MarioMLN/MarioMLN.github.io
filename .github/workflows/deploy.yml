@@ -6,10 +6,12 @@ on:
       - main
 
 permissions:
-  contents: write  # <== Isso é ESSENCIAL para dar permissão de push
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,6 +21,17 @@ jobs:
       - name: Verificar se index.html existe
         run: |
           if [ ! -f public/index.html ]; then
-            echo "Erro: public/index.html não existe."
+            echo "Erro: public/index.html não encontrado."
             exit 1
           fi
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v3
+
+      - name: Enviar artefato para Pages
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: public
+
+      - name: Publicar no GitHub Pages
+        uses: actions/deploy-pages@v1
